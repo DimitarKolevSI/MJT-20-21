@@ -1,15 +1,24 @@
 package bg.sofia.uni.fmi.mjt.socialmedia;
 
-import bg.sofia.uni.fmi.mjt.socialmedia.content.Content;
+import java.util.Set;
+import java.util.Map;
+import java.util.List;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.time.LocalDateTime;
+
 import bg.sofia.uni.fmi.mjt.socialmedia.content.Post;
 import bg.sofia.uni.fmi.mjt.socialmedia.content.Story;
-import bg.sofia.uni.fmi.mjt.socialmedia.exceptions.ContentNotFoundException;
+import bg.sofia.uni.fmi.mjt.socialmedia.content.Content;
+import bg.sofia.uni.fmi.mjt.socialmedia.content.AbstractContent;
 import bg.sofia.uni.fmi.mjt.socialmedia.exceptions.NoUsersException;
-import bg.sofia.uni.fmi.mjt.socialmedia.exceptions.UsernameAlreadyExistsException;
+import bg.sofia.uni.fmi.mjt.socialmedia.exceptions.ContentNotFoundException;
 import bg.sofia.uni.fmi.mjt.socialmedia.exceptions.UsernameNotFoundException;
-
-import java.time.LocalDateTime;
-import java.util.*;
+import bg.sofia.uni.fmi.mjt.socialmedia.exceptions.UsernameAlreadyExistsException;
 
 public class EvilSocialInator implements SocialMediaInator {
 
@@ -17,7 +26,7 @@ public class EvilSocialInator implements SocialMediaInator {
     private Map<String, Content> contents;
     private Map<String, List<String>> activityByUser;
 
-    EvilSocialInator() {
+    public EvilSocialInator() {
         users = new HashSet<>();
         activityByUser = new LinkedHashMap<>();
         contents = new LinkedHashMap<>();
@@ -137,7 +146,8 @@ public class EvilSocialInator implements SocialMediaInator {
         } else if (!contents.containsKey(id)) {
             throw new ContentNotFoundException("There is no content with this id in the platform!");
         } else {
-            contents.get(id).like(username);
+            AbstractContent content = (AbstractContent) (contents.get(id));
+            content.like(username);
             String log = String.format("%s Liked a content with id %s", getFormatedDate(LocalDateTime.now()), id);
             activityByUser.get(username).add(log);
         }
@@ -167,8 +177,10 @@ public class EvilSocialInator implements SocialMediaInator {
         } else if (!contents.containsKey(id)) {
             throw new ContentNotFoundException("There is no content with this id in the platform!");
         } else {
-            contents.get(id).comment(username, text);
-            String log = String.format("%s Commented \"%s\" on a content with id %s", getFormatedDate(LocalDateTime.now()), text, id);
+            AbstractContent content = (AbstractContent) (contents.get(id));
+            content.comment(username, text);
+            String log = String.format("%s Commented \"%s\" on a content with id %s",
+                    getFormatedDate(LocalDateTime.now()), text, id);
             activityByUser.get(username).add(log);
         }
     }
@@ -195,7 +207,8 @@ public class EvilSocialInator implements SocialMediaInator {
         }
         List<Content> contents = new ArrayList<>();
         for (Content content : this.contents.values()) {
-            if (content.isActive()) {
+            AbstractContent abstractContent = (AbstractContent) content;
+            if (abstractContent.isActive()) {
                 contents.add(content);
             }
         }
@@ -231,7 +244,8 @@ public class EvilSocialInator implements SocialMediaInator {
         } else {
             List<Content> list = new ArrayList<>();
             for (Content content : contents.values()) {
-                if (content.equals(username) && content.isActive()) {
+                AbstractContent abstractContent = (AbstractContent) content;
+                if (abstractContent.equals(username) && abstractContent.isActive()) {
                     list.add(content);
                 }
             }
@@ -261,7 +275,8 @@ public class EvilSocialInator implements SocialMediaInator {
                 for (String mention : content.getMentions()) {
                     String username = mention.substring(1);
                     if (!users.contains(username)) {
-                        int frequency = frequencyByUsername.containsKey(username) ? frequencyByUsername.get(username) : 0;
+                        int frequency =
+                                frequencyByUsername.containsKey(username) ? frequencyByUsername.get(username) : 0;
                         frequencyByUsername.put(username, frequency + 1);
                     }
                 }

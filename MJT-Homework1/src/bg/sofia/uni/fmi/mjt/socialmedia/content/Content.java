@@ -30,12 +30,4 @@ public interface Content {
      * Аll mentions should start with '@'.
      */
     Collection<String> getMentions();
-
-    boolean isActive();
-
-    void like(String username);
-
-    void comment(String username, String text);
-
-    String getCreatorsUsername();
 }

@@ -2,7 +2,10 @@ package bg.sofia.uni.fmi.mjt.socialmedia.content;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public abstract class AbstractContent implements Content {
 
@@ -80,7 +83,6 @@ public abstract class AbstractContent implements Content {
         likes.add(username);
     }
 
-    @Override
     public boolean isActive() {
         LocalDateTime today = LocalDateTime.now();
         long difference = Duration.between(this.publicationDate, today).toDays();
@@ -89,8 +91,12 @@ public abstract class AbstractContent implements Content {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AbstractContent that = (AbstractContent) o;
         return id.equals(that.id);
     }
@@ -100,7 +106,6 @@ public abstract class AbstractContent implements Content {
         return Objects.hash(id);
     }
 
-    @Override
     public void like(String username) {
         likes.add(username);
     }
